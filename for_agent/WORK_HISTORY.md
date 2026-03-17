@@ -1,5 +1,12 @@
 # Work History
 
+## b5df9ef — Add vLLM SkyPilot config and entity extraction pipeline
+- Created `skypilot.yaml`: GCP us-central1, A10G spot, serves Qwen3-8B-FP8 via vLLM, then runs extraction
+- Created `extract.py`: full extraction pipeline — chunks → LLM (OpenAI-compatible API, thinking disabled) → entity resolution → graph upsert → checkpoint
+- Graph model: JSON with versioned properties and relationship assertions, each carrying source chunk provenance
+- Entity resolution: exact match → alias match → create new; merges properties and aliases on upsert
+- Checkpoints after every chunk for spot interruption safety; final output is `graph.json`
+
 ## fcecac9 — Add scene-based chunker and scene word count stats to explore.py
 - Added `scene_word_count_stats()` to `explore.py`: reports min/median/mean/max/p90/p95 word counts per scene across all seasons (8,356 scenes, median 29 words, max 733 words)
 - Created `chunk.py`: scene-based chunker for season 8 (626 chunks; 617 mixed, 6 narration-only, 3 dialogue-only)
