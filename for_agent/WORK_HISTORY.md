@@ -1,5 +1,12 @@
 # Work History
 
+## fcecac9 — Add scene-based chunker and scene word count stats to explore.py
+- Added `scene_word_count_stats()` to `explore.py`: reports min/median/mean/max/p90/p95 word counts per scene across all seasons (8,356 scenes, median 29 words, max 733 words)
+- Created `chunk.py`: scene-based chunker for season 8 (626 chunks; 617 mixed, 6 narration-only, 3 dialogue-only)
+- Chunking strategy (Option 3): process per-episode, merge consecutive stage directions into a single block as scene header, attach to following dialogue; trailing narration becomes its own chunk
+- Supports `--output/-o` flag to write all chunks to a text file with `season/episode/scene_index` headers
+- Season 8 chunk stats: median 30 words, max 388 words, p95 114 words — all well within LLM extraction context limits
+
 ## ff9b39a — Add explore.py with comprehensive GoT dataset statistics
 - Created `explore.py` to summarize `got.csv` (33,198 rows of GoT dialogue)
 - **Basic stats**: row counts, missing values, dtypes, speaker/season/episode/text distributions
