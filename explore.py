@@ -302,6 +302,50 @@ def longest_monologues(df: pd.DataFrame) -> None:
         print(f"        \"{preview}...\"")
 
 
+# ── Scene statistics ──────────────────────────────────────────
+
+
+def scene_word_count_stats(df: pd.DataFrame) -> None:
+    """Word count distribution per scene (stage direction + following dialogue)."""
+    print()
+    print("=" * 60)
+    print("SCENE WORD COUNT STATS  (stage direction + following dialogue)")
+    print("=" * 60)
+
+    scene_word_counts = []
+    current_words = 0
+    in_scene = False
+
+    for _, row in df.iterrows():
+        is_stage = pd.isna(row["Speaker"])
+        text = row["Text"] if pd.notna(row["Text"]) else ""
+        words = len(text.split())
+
+        if is_stage:
+            if in_scene:
+                scene_word_counts.append(current_words)
+            current_words = words
+            in_scene = True
+        else:
+            current_words += words
+
+    if in_scene:
+        scene_word_counts.append(current_words)
+
+    if not scene_word_counts:
+        print("  No scenes found.")
+        return
+
+    counts = pd.Series(scene_word_counts)
+    print(f"\n  Total scenes : {len(counts):,}")
+    print(f"  {'min':<8s}: {counts.min():>6,.0f} words")
+    print(f"  {'median':<8s}: {counts.median():>6,.0f} words")
+    print(f"  {'mean':<8s}: {counts.mean():>6,.1f} words")
+    print(f"  {'max':<8s}: {counts.max():>6,.0f} words")
+    print(f"  {'p90':<8s}: {counts.quantile(0.90):>6,.0f} words")
+    print(f"  {'p95':<8s}: {counts.quantile(0.95):>6,.0f} words")
+
+
 # ── Temporal / structural statistics ─────────────────────────
 
 
@@ -438,6 +482,9 @@ def main() -> None:
     vocabulary_richness(df)
     character_arcs(df)
     longest_monologues(df)
+
+    # Scene stats
+    scene_word_count_stats(df)
 
     # Temporal / structural
     pacing_trends(df)
