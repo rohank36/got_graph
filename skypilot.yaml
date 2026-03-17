@@ -1,0 +1,31 @@
+name: got-extractor
+
+resources:
+  infra: gcp/us-central1
+  accelerators: A10G:1
+  use_spot: true
+
+workdir: .
+
+setup: |
+  pip install vllm uv
+  uv pip install openai tqdm pandas
+
+run: |
+  # Start vLLM server in background
+  vllm serve Qwen/Qwen3-8B-FP8 \
+    --port 8000 \
+    --max-model-len 4096 \
+    --gpu-memory-utilization 0.85 \
+    &
+
+  # Wait for server to be ready
+  echo "Waiting for vLLM server..."
+  until curl -s http://localhost:8000/health > /dev/null; do
+    sleep 5
+  done
+  echo "Server ready."
+  
+  python extract.py \
+    --output graph.json \
+    --checkpoint graph_checkpoint.json
